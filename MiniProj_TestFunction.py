@@ -2,8 +2,10 @@ import numpy as np
 import cv2 as cv
 from picamera import PiCamera
 from time import sleep
+import serial
 
-#hello
+ser = serial.Serial("/dev/ttyAMC0", 9600)
+aruco_setpoints = {0: 0, 1: 1.57, 2: 3.14, 3: 4.71}
 
 def cameraCalibration():
     with PiCamera() as camera:
@@ -32,17 +34,14 @@ def continualCapture():
         
         h = gray.shape[0]
         w = gray.shape[1]
-            
-            
+        
         parameters = cv.aruco.DetectorParameters_create()
             
         corners, ids, rejectedImgPoints = cv.aruco.detectMarkers(gray, dictionary, parameters = parameters)
         cv.aruco.detectMarkers(gray, dictionary, corners, ids)
-        if (ids is not None):
-                
-            cv.aruco.drawDetectedMarkers(gray, corners, ids)
+        if ids is not None and ids[0] in aruco_setpoints:
             
-                
+            cv.aruco.drawDetectedMarkers(gray, corners, ids)
             
             for x in ids:
                 
@@ -60,22 +59,31 @@ def continualCapture():
                 
                 if ((dir_x >= 0) and (dir_y >= 0)):
                     print("First")
+                    setpoint = aruco_setpoints[0]
+                    ser.write(str(setpoint).encode())
                 elif ((dir_x < 0) and (dir_y >=0)):
                     print("Second")
-                    
+                    setpoint = aruco_setpoints[1]
+                    ser.write(str(setpoint).encode())
                 elif ((dir_x < 0) and (dir_y < 0)):
                     print ('Third')
-                    
+                    setpoint = aruco_setpoints[2]
+                    ser.write(str(setpoint).encode())
                 elif ((dir_x >=0) and (dir_y <0)):
                     print("Fourth")
-                
-                            
+                    setpoint = aruco_setpoints[3]
+                    ser.write(str(setpoint).encode())
+                    
+                    
         cv.line(gray, (0, int(h/2)),(w,int(h/2)), (0,255,0),3)
         cv.line(gray, (int(w/2),0), (int(w/2),h), (0,255,0),3)    
         cv.imshow('output', gray)
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
-
+        
+        recieved_position = ser.readline().decode().strip()
+        position = float(received_postion)*(2*3.14)/1024
+        print("Current position =", position)
 
     #end While
     cap.release()
