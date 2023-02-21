@@ -7,8 +7,8 @@ import time
 import board
 import adafruit_character_lcd.character_lcd_rgb_i2c as character_lcd
 
-ser = serial.Serial("/dev/ttyAMC0", 9600)
-aruco_setpoints = {0: 0, 1: 1.57, 2: 3.14, 3: 4.71}
+ser = serial.Serial("/dev/ttyAMC0", 9600, timeout=1)
+ser.reset_input_buffer()
 
 lcd_columns = 16
 lcd_rows = 2
@@ -47,7 +47,8 @@ def continualCapture():
             
         corners, ids, rejectedImgPoints = cv.aruco.detectMarkers(gray, dictionary, parameters = parameters)
         cv.aruco.detectMarkers(gray, dictionary, corners, ids)
-        if ids is not None and ids[0] in aruco_setpoints:
+        
+        if ids is not None:
             
             cv.aruco.drawDetectedMarkers(gray, corners, ids)
             
@@ -67,7 +68,7 @@ def continualCapture():
                 
                 if ((dir_x >= 0) and (dir_y >= 0)):
                     print("First")
-                    setpoint = aruco_setpoints[0]
+                    setpoint = 0
                     ser.write(str(setpoint).encode())
                     lcd.clear()
                     lcd.color = [0,0,100]
@@ -75,7 +76,7 @@ def continualCapture():
                     lcd.message = "Setpoint: 0"
                 elif ((dir_x < 0) and (dir_y >=0)):
                     print("Second")
-                    setpoint = aruco_setpoints[1]
+                    setpoint = np.pi/2
                     ser.write(str(setpoint).encode())
                     lcd.clear()
                     lcd.color = [0,0,100]
@@ -83,7 +84,7 @@ def continualCapture():
                     lcd.message = "Setpoint: pi/2"
                 elif ((dir_x < 0) and (dir_y < 0)):
                     print ('Third')
-                    setpoint = aruco_setpoints[2]
+                    setpoint = np.pi
                     ser.write(str(setpoint).encode())
                     lcd.clear()
                     lcd.color = [0,0,100]
@@ -91,7 +92,7 @@ def continualCapture():
                     lcd.message = "Setpoint: pi"
                 elif ((dir_x >=0) and (dir_y <0)):
                     print("Fourth")
-                    setpoint = aruco_setpoints[3]
+                    setpoint = 3*np.pi/2
                     ser.write(str(setpoint).encode())
                     lcd.clear()
                     lcd.color = [0,0,100]
