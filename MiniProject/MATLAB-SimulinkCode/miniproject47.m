@@ -1,6 +1,6 @@
 % Ahmed Aldhamari 
 % SEED Lab EENG350
-%mini project closed loop system
+%Mini-project closed loop system
 %% miniproject47.m
 %% Transferfunction Values
 K=0.00375;
@@ -10,4 +10,6 @@ open_system('Miniproject')
 out=sim('Miniproject');
 %% A Plot of the results
 figure
-plot(out.simout,'r:')
+plot(out.velocity,'r:') %Actual Velocity
+figure
+plot(out.position,'b')  %Actual Position 
