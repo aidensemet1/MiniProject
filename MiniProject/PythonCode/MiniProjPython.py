@@ -19,6 +19,8 @@ i2c = board.I2C()
 lcd = character_lcd.Character_LCD_RGB_I2C(i2c, lcd_columns, lcd_rows)
 
 # function that calibrates the camera settings
+# funciton sets consitant white balance, iso
+# shutter speed, exposure, and framerate
 def cameraCalibration():
     with PiCamera() as camera:
         camera.framerate = 24
@@ -31,14 +33,15 @@ def cameraCalibration():
         camera.awb_mode ='off'
         camera.awb_gains = g
         
-# function that 
+# function that carries out detection and quadrant identification of markers
 def continualCapture():
+    # initialize video capture and aruco dictionary
     cap = cv.VideoCapture(0)
     dictionary = cv.aruco.Dictionary_get(cv.aruco.DICT_6X6_250)
 
     while(True):
         old_setpoint = ""
-        ret, frame = cap.read()
+        ret, frame = cap.read() # get current frame and convert to grayscale
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         
         h = gray.shape[0]
@@ -49,13 +52,17 @@ def continualCapture():
         corners, ids, rejectedImgPoints = cv.aruco.detectMarkers(gray, dictionary, parameters = parameters)
         cv.aruco.detectMarkers(gray, dictionary, corners, ids)
         if ids is not None:
-                            
+             
+             # following code identifies the middle of the detected marker
             first = corners[0][0][0]
             third = corners[0][0][2]
                 
             middle_x = int( 0.5*(third[0] + first[0]) )
             middle_y = int( 0.5*(third[1] + first[1]) )
-                
+            
+            # following code creates direction variables indicating
+            # the top or bottom half of the frame
+            # the left or right of the frame
             dir_x = middle_x - w/2
             dir_y = h/2 - middle_y
                 
@@ -85,12 +92,13 @@ def continualCapture():
                 lcd.message = "S: " + str(setpoint)
                 new_position = recieved_position
                 lcd.message = "\nP: " + str(new_position)
-        
+                
+        #display current image and quit dection program if "q" is pressed"
         cv.imshow('output', gray)
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
         
-    #end While
+    #end While and close all windows / release camera capture
     cap.release()
     cv.destroyAllWindows()
     print("Exiting function")
