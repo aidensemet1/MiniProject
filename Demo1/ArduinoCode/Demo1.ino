@@ -61,9 +61,13 @@ void loop() {
   if (C >=0) {
     digitalWrite(mLDirPin, LOW);
     analogWrite(mLSpeedPin, int(51*C));
+    digitalWrite(mRDirPin, LOW);
+    analogWrite(mRSpeedPin, int(51*C));
   } else {
     digitalWrite(mLDirPin, HIGH);
     analogWrite(mLSpeedPin, int(-51*C));
+    digitalWrite(mRDirPin, HIGH);
+    analogWrite(mRSpeedPin, int(-51*C));
   }
 
   while(millis() < Tc + Ts){}
