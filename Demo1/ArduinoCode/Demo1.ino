@@ -46,7 +46,7 @@ float Ts = 5; // sampling rate I think?(10 ms)
   motorSetup();
   
   //distance calculations
-  requiredRadians = (desiredDistance/(circumference/2))*pi; //radians required to travel desired distance
+  requiredRadians = ((desiredDistance*12)/(circumference/2))*pi; //radians required to travel desired distance
 }
 
 void loop() {
