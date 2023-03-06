@@ -19,6 +19,7 @@ long newCount;
 float radPerCount = 0.001963;
 float pi = 3.14159;
 float diameter = 5.5;
+float radius = diameter/2;
 float circumference = pi * diameter;
 
 //SETUP PINS (don't change these, they are specified on the motor driver data sheet)
