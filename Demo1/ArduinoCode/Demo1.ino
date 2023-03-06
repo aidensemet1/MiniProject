@@ -3,7 +3,7 @@ int N = 1; // loop iterations
 #include <Encoder.h>   // encoder Arduino library
 
 //distance and angle
-float desiredDistance = 10; //in feet
+float desiredDistance = 2; //in feet
 float requiredRadians; //calculated radians required to turn based on desired distance to travel
 float desiredAngle = 90; //in degrees
 
