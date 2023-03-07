@@ -4,7 +4,6 @@ int N = 1; // loop iterations
 
 //distance and angle
 float desiredDistance = 2; //in feet
-float requiredRadians; //calculated radians required to turn based on desired distance to travel
 float desiredAngle = 90; //in degrees
 
 //encoder pins for localization (2 and 3 are interrupt pins)
@@ -16,11 +15,20 @@ float ref;  //radians for the wheel to turn
 float theta = 0;
 long count = 0;
 long newCount;
+
+//constants
 float radPerCount = 0.001963;
 float pi = 3.14159;
 float diameter = 5.5;
-float radius = diameter/2;
-float circumference = pi * diameter;
+float vehicleRadius = 4; //distance from centerpoint of vehicle to the wheel (inches)
+
+float radius = diameter/2; //radius of the wheels (inches)
+float circumference = pi * diameter; //circumference of the wheels (inches)
+float requiredRadiansFwd; //radians required for vehicle to move forward
+float requiredRadiansTrn; //radians required for vehicle to turn in place
+float desiredAngleRad = (pi/180)*desiredAngle; //desired angle converted to radians
+float rotationDistance = vehicleRadius*desiredAngleRad; //distance for each wheel to travel to achieve desired angle
+bool hasTurned = false;
 
 //SETUP PINS (don't change these, they are specified on the motor driver data sheet)
 int D2 = 4; //motor board enable pin
@@ -47,23 +55,57 @@ float Ts = 5; // sampling rate I think?(10 ms)
   motorSetup();
   
   //distance calculations
-  requiredRadians = ((desiredDistance*12)/(circumference/2))*pi; //radians required to travel desired distance
+  requiredRadiansFwd = ((desiredDistance*12)/(circumference/2))*pi; //radians required to travel desired distance
+  
+  //turn in place calculations
+  requiredRadiansTrn = ((rotationDistance)/(circumference/2))*pi; //radians required to turn in place to desired angle
+  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
+ 
+  //turning
+  if (hasTurned == false) {
+      Tc = millis(); //get current time ms
+      e = requiredRadiansTrn - getCurrentPos();
+      Ie = Ie + e * Ts*0.001; // calculating the integral
+      int Ctrn = Kp* e + Ie* Ki; // This will be in volts
+ 
+      if (desiredAngle >= 0) { //clockwise
+        //left motor
+        digitalWrite(mLDirPin, LOW);
+        analogWrite(mLSpeedPin, int(51*Ctrn));
+        //right motor
+        digitalWrite(mRDirPin, HIGH);
+        analogWrite(mRSpeedPin, int(51*Ctrn));
+      } else { //counterclockwise
+        //left motor
+        digitalWrite(mLDirPin, HIGH);
+        analogWrite(mLSpeedPin, int(51*C));
+        //right motor
+        digitalWrite(mRDirPin, LOW);
+        analogWrite(mRSpeedPin, int(51*C));
+      }
+      hasTurned = True;
+  }
+  
+ 
+ 
+  
+  //forward
   Tc = millis(); //get current time ms
-  e = requiredRadians - getCurrentPos();
+  e = requiredRadiansFwd - getCurrentPos();
   Ie = Ie + e * Ts*0.001; // calculating the integral
   int C = Kp* e + Ie* Ki; // This will be in volts
-
-  if (C >=0) {
+ 
+  if (C >=0) { //forward ?
     digitalWrite(mLDirPin, LOW);
     analogWrite(mLSpeedPin, int(51*C));
     digitalWrite(mRDirPin, LOW);
     analogWrite(mRSpeedPin, int(51*C));
-  } else {
+  } else { //backward ?
     digitalWrite(mLDirPin, HIGH);
     analogWrite(mLSpeedPin, int(-51*C));
     digitalWrite(mRDirPin, HIGH);
