@@ -20,7 +20,7 @@ long newCount;
 float radPerCount = 0.001963;
 float pi = 3.14159;
 float diameter = 5.5;
-float vehicleRadius = 4; //distance from centerpoint of vehicle to the wheel (inches)
+float vehicleRadius = 6; //distance from centerpoint of vehicle to the wheel (inches)
 
 float radius = diameter/2; //radius of the wheels (inches)
 float circumference = pi * diameter; //circumference of the wheels (inches)
@@ -36,7 +36,6 @@ int mLDirPin = 7; //Left motor direction pin
 int mLSpeedPin = 9; //Left motor speed pin 
 int mRDirPin = 8; //right motor direction pin
 int mRSpeedPin = 10; //right motor speed pin
-
 
 // Initializing controller gains
 float Kp = 10; // Proportional gain
