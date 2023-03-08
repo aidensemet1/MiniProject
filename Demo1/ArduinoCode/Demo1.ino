@@ -69,6 +69,7 @@ void loop() {
       
       Ie = Ie + e * Ts*0.001; // calculating the integral
       int Ctrn = Kp* e + Ie* Ki; // This will be in volts
+      int C = Kp* e + Ie* Ki; // This will be in volts
  
       if (desiredAngle >= 0) { //clockwise
         //left motor
@@ -85,15 +86,16 @@ void loop() {
         digitalWrite(mRDirPin, LOW);
         analogWrite(mRSpeedPin, int(51*C));
       }
-  
-
   if (e == 0) {
+    hasTurned = true;
+  }
+
+  if (hasTurned == true) {
    //forward
    Tc = millis(); //get current time ms
    e = requiredRadiansFwd - getCurrentPos();
    Ie = Ie + e * Ts*0.001; // calculating the integral
-   int C = Kp* e + Ie* Ki; // This will be in volts
- 
+   C = Kp* e + Ie* Ki; // This will be in volts
    if (C >=0) { //forward ?
      digitalWrite(mLDirPin, LOW);
      analogWrite(mLSpeedPin, int(51*C));
@@ -114,7 +116,7 @@ void loop() {
 
 //function that gets the current position of the wheel
 float getCurrentPos() {
-  newCount = wheel.read();
+  newCount = Rwheel.read();
   theta = newCount * radPerCount;
   return theta;
 }
@@ -122,9 +124,12 @@ float getCurrentPos() {
 
 // This function initilizes the motor, direction, and enable pins
 void motorSetup() {
-  pinMode(m1DirPin, OUTPUT);
-  pinMode(m1SpeedPin, OUTPUT);
+  pinMode(mRDirPin, OUTPUT);
+  pinMode(mRSpeedPin, OUTPUT);
+  pinMode(mLDirPin, OUTPUT);
+  pinMode(mLSpeedPin, OUTPUT);
   pinMode(D2, OUTPUT);
   digitalWrite(D2,HIGH); //enable motor driver board
-  analogWrite(m1SpeedPin, 0); //set motor voltage to 0
+  analogWrite(mRSpeedPin, 0); //set motor voltage to 0
+  analogWrite(mLSpeedPin, 0); //set motor voltage to 0
 }
