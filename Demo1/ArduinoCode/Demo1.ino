@@ -19,7 +19,7 @@ long newCount;
 //constants
 float radPerCount = 0.001963;
 float pi = 3.14159;
-float diameter = 5.5;
+float diameter = 6; //inches
 float vehicleRadius = 6; //distance from centerpoint of vehicle to the wheel (inches)
 
 float radius = diameter/2; //radius of the wheels (inches)
@@ -63,12 +63,10 @@ float Ts = 5; // sampling rate I think?(10 ms)
 
 void loop() {
   // put your main code here, to run repeatedly:
-
- 
   //turning
-  if (hasTurned == false) {
       Tc = millis(); //get current time ms
       e = requiredRadiansTrn - getCurrentPos();
+      
       Ie = Ie + e * Ts*0.001; // calculating the integral
       int Ctrn = Kp* e + Ie* Ki; // This will be in volts
  
@@ -87,42 +85,40 @@ void loop() {
         digitalWrite(mRDirPin, LOW);
         analogWrite(mRSpeedPin, int(51*C));
       }
-      hasTurned = True;
+  
+
+  if (e == 0) {
+   //forward
+   Tc = millis(); //get current time ms
+   e = requiredRadiansFwd - getCurrentPos();
+   Ie = Ie + e * Ts*0.001; // calculating the integral
+   int C = Kp* e + Ie* Ki; // This will be in volts
+ 
+   if (C >=0) { //forward ?
+     digitalWrite(mLDirPin, LOW);
+     analogWrite(mLSpeedPin, int(51*C));
+     digitalWrite(mRDirPin, LOW);
+     analogWrite(mRSpeedPin, int(51*C));
+   } else { //backward ?
+     digitalWrite(mLDirPin, HIGH);
+     analogWrite(mLSpeedPin, int(-51*C));
+     digitalWrite(mRDirPin, HIGH);
+     analogWrite(mRSpeedPin, int(-51*C));
+   }
   }
   
- 
- 
-  
-  //forward
-  Tc = millis(); //get current time ms
-  e = requiredRadiansFwd - getCurrentPos();
-  Ie = Ie + e * Ts*0.001; // calculating the integral
-  int C = Kp* e + Ie* Ki; // This will be in volts
- 
-  if (C >=0) { //forward ?
-    digitalWrite(mLDirPin, LOW);
-    analogWrite(mLSpeedPin, int(51*C));
-    digitalWrite(mRDirPin, LOW);
-    analogWrite(mRSpeedPin, int(51*C));
-  } else { //backward ?
-    digitalWrite(mLDirPin, HIGH);
-    analogWrite(mLSpeedPin, int(-51*C));
-    digitalWrite(mRDirPin, HIGH);
-    analogWrite(mRSpeedPin, int(-51*C));
-  }
 
   while(millis() < Tc + Ts){}
 }
 
-/*
+
 //function that gets the current position of the wheel
-//used in our testing & tuning of the motor
 float getCurrentPos() {
   newCount = wheel.read();
   theta = newCount * radPerCount;
   return theta;
 }
-*/
+
 
 // This function initilizes the motor, direction, and enable pins
 void motorSetup() {
