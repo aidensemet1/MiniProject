@@ -4,7 +4,7 @@ int N = 1; // loop iterations
 
 //distance and angle
 float desiredDistance = 2; //in feet
-float desiredAngle = 90; //in degrees
+float desiredAngle = 0; //in degrees
 
 //encoder pins for localization (2 and 3 are interrupt pins)
 Encoder Lwheel(2, 4);
@@ -48,6 +48,9 @@ float e; // current error
 // Time variables
 float Ts = 5; // sampling rate I think?(10 ms)
 
+int C;
+int Ctrn;
+
  void setup() {
   // put your setup code here, to run once:
   Serial.begin(250000);  //start serial communication w/ baud rate of 250000
@@ -59,17 +62,21 @@ float Ts = 5; // sampling rate I think?(10 ms)
   //turn in place calculations
   requiredRadiansTrn = ((rotationDistance)/(circumference/2))*pi; //radians required to turn in place to desired angle
   
+  if (desiredAngle == 0) {
+    hasTurned = true;
+  }
+
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   //turning
+
       Tc = millis(); //get current time ms
       e = requiredRadiansTrn - getCurrentPos();
-      
       Ie = Ie + e * Ts*0.001; // calculating the integral
-      int Ctrn = Kp* e + Ie* Ki; // This will be in volts
-      int C = Kp* e + Ie* Ki; // This will be in volts
+      Ctrn = Kp* e + Ie* Ki; // This will be in volts
+      C = Kp* e + Ie* Ki; // This will be in volts
  
       if (desiredAngle >= 0) { //clockwise
         //left motor
@@ -86,6 +93,7 @@ void loop() {
         digitalWrite(mRDirPin, LOW);
         analogWrite(mRSpeedPin, int(51*C));
       }
+
   if (e == 0) {
     hasTurned = true;
   }
