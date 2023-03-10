@@ -14,8 +14,7 @@ String read_setpoint;
 float ref;  //radians for the wheel to turn
 float theta = 0;
 long count = 0;
-long newCountR;
-long newCountL;
+long newCount;
 
 //constants
 float radPerCount = 0.001963;
@@ -43,14 +42,17 @@ float Kp = 10; // Proportional gain
 float Ki = 0; // Integral gain
 
 // error variables
-float Ie; // running integral of error
-float e; // current error
+  //left
+float IeL; // left running integral of error
+float eL; // left current error
+float IeR; // right running integral of error
+float eR; //right current error
 
 // Time variables
 float Ts = 5; // sampling rate I think?(10 ms)
+int CL; //left motor voltage
+int CR; //right motor voltage
 
-int C;
-int Ctrn;
 
  void setup() {
   // put your setup code here, to run once:
@@ -73,70 +75,94 @@ void loop() {
   // put your main code here, to run repeatedly:
   //turning
 
-      Tc = millis(); //get current time ms
-      e = requiredRadiansTrn - getCurrentPos();
-      Ie = Ie + e * Ts*0.001; // calculating the integral
-      Ctrn = Kp* e + Ie* Ki; // This will be in volts
-      C = Kp* e + Ie* Ki; // This will be in volts
- 
-      if (desiredAngle >= 0) { //clockwise
-        //left motor
-        digitalWrite(mLDirPin, LOW);
-        analogWrite(mLSpeedPin, int(51*Ctrn));
-        //right motor
-        digitalWrite(mRDirPin, HIGH);
-        analogWrite(mRSpeedPin, int(51*Ctrn));
-      } else { //counterclockwise
-        //left motor
-        digitalWrite(mLDirPin, HIGH);
-        analogWrite(mLSpeedPin, int(51*C));
-        //right motor
-        digitalWrite(mRDirPin, LOW);
-        analogWrite(mRSpeedPin, int(51*C));
-      }
+  Tc = millis(); //get current time ms
 
-  if (e == 0) {
+  //left motor calculations
+  eL = requiredRadiansTrn - getCurrentPosL();
+  IeL = IeL + eL * Ts*0.001; // calculating the integral
+  CL = Kp* eL + IeL* Ki; // This will be in volts
+  //right motor calculations
+  eR = requiredRadiansTrn - getCurrentPosR();
+  IeR = IeR + eR * Ts*0.001; // calculating the integral
+  CR = Kp* eR + IeR* Ki; // This will be in volts
+ 
+  if (desiredAngle >= 0) { //clockwise
+    //left motor
+    digitalWrite(mLDirPin, LOW);
+    analogWrite(mLSpeedPin, int(51*CL));
+    //right motor
+    digitalWrite(mRDirPin, HIGH);
+    analogWrite(mRSpeedPin, int(51*CR));
+  } else { //counterclockwise
+    //left motor
+    digitalWrite(mLDirPin, HIGH);
+    analogWrite(mLSpeedPin, int(51*CL));
+    //right motor
+    digitalWrite(mRDirPin, LOW);
+    analogWrite(mRSpeedPin, int(51*CL));
+  }
+
+  //Angle check (use an anlge check function to confirm correct angle then reset current angle to 0)
+  if ((eR == 0) && (eL == 0)) { //once both motors have reached the desired angle
     hasTurned = true;
   }
 
+
+  //Forward movement
   if (hasTurned == true) {
-   //forward
-   Tc = millis(); //get current time ms
-   e = requiredRadiansFwd - getCurrentPos();
-   Ie = Ie + e * Ts*0.001; // calculating the integral
-   C = Kp* e + Ie* Ki; // This will be in volts
-   if (C >=0) { //forward ?
-     digitalWrite(mLDirPin, LOW);
-     analogWrite(mLSpeedPin, int(51*C));
-     digitalWrite(mRDirPin, LOW);
-     analogWrite(mRSpeedPin, int(51*C));
-   } else { //backward ?
-     digitalWrite(mLDirPin, HIGH);
-     analogWrite(mLSpeedPin, int(-51*C));
-     digitalWrite(mRDirPin, HIGH);
-     analogWrite(mRSpeedPin, int(-51*C));
-   }
+  //left calculations
+  Tc = millis(); //get current time ms
+  eL = requiredRadiansFwd - getCurrentPosL();
+  IeL = IeL + eL * Ts*0.001; // calculating the integral
+  CL = Kp* eL + IeL* Ki; // This will be in volts
+
+  //left motor
+  if (CL >= 0) { //forward
+    digitalWrite(mLDirPin, LOW);
+    analogWrite(mLSpeedPin, int(51*CL));
+  } else { //backward
+    digitalWrite(mLDirPin, HIGH);
+    analogWrite(mLSpeedPin, int(-51*CL));
   }
+
+  //right calculations
+  Tc = millis(); //get current time ms
+  eR = requiredRadiansFwd - getCurrentPosR();
+  IeR = IeR + eR * Ts*0.001; // calculating the integral
+  CR = Kp* eR + IeR* Ki; // This will be in volts
+
+  //right motor
+  if (CR >= 0) { //forward
+    digitalWrite(mRDirPin, LOW);
+    analogWrite(mRSpeedPin, int(51*CR));
+  } else { //backward
+    digitalWrite(mRDirPin, HIGH);
+    analogWrite(mRSpeedPin, int(-51*CR));
+  }
+
   
 
   while(millis() < Tc + Ts){}
 }
 
-
-//function that gets the current position of the Right wheel
-float getRCurrentPos() {
-  newCountR = Rwheel.read();
-  thetaR = newCountR * radPerCountR;
-  return thetaR;
+//function that gets the current position of the wheel
+float getCurrentPosR() {
+  newCount = Rwheel.read();
+  theta = newCount * radPerCount;
+  return theta;
 }
 
 //function that gets the current position of the left wheel
-float getLCurrentPos() {
+float getCurrentPosL() {
  newCountL = Lwheel.read();
  thetaL = newCountL * radPerCountL;
  return thetaL;
 }
 
+//function that will check the current angle of the vehicle
+float getCurrentAngle() {
+  
+}
 
 
 // This function initilizes the motor, direction, and enable pins
