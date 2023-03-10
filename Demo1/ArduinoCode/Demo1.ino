@@ -75,8 +75,9 @@ void loop() {
   // put your main code here, to run repeatedly:
   //turning
 
-  Tc = millis(); //get current time ms
 
+  //TURNING MOVEMENT
+  Tc = millis(); //get current time ms
   //left motor calculations
   eL = requiredRadiansTrn - getCurrentPosL();
   IeL = IeL + eL * Ts*0.001; // calculating the integral
@@ -92,14 +93,14 @@ void loop() {
     analogWrite(mLSpeedPin, int(51*CL)); //~im not sure if any of these should have a - sign in them like the forward movement code
     //right motor
     digitalWrite(mRDirPin, HIGH);
-    analogWrite(mRSpeedPin, int(51*CR)); //~
+    analogWrite(mRSpeedPin, int(-51*CR)); //~
   } else { //counterclockwise
     //left motor
     digitalWrite(mLDirPin, HIGH);
-    analogWrite(mLSpeedPin, int(51*CL)); //~
+    analogWrite(mLSpeedPin, int(-51*CL)); //~
     //right motor
     digitalWrite(mRDirPin, LOW);
-    analogWrite(mRSpeedPin, int(51*CL)); //~
+    analogWrite(mRSpeedPin, int(51*CR)); //~
   }
 
   //Angle check (use an angle check function that I haven't finished to confirm correct angle)
@@ -107,8 +108,7 @@ void loop() {
     hasTurned = true;
   }
 
-
-  //Forward movement
+  //FORWARD MOVEMENT
   if (hasTurned == true) {
   //left calculations
   Tc = millis(); //get current time ms
