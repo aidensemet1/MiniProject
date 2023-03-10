@@ -89,20 +89,20 @@ void loop() {
   if (desiredAngle >= 0) { //clockwise
     //left motor
     digitalWrite(mLDirPin, LOW);
-    analogWrite(mLSpeedPin, int(51*CL));
+    analogWrite(mLSpeedPin, int(51*CL)); //~im not sure if any of these should have a - sign in them like the forward movement code
     //right motor
     digitalWrite(mRDirPin, HIGH);
-    analogWrite(mRSpeedPin, int(51*CR));
+    analogWrite(mRSpeedPin, int(51*CR)); //~
   } else { //counterclockwise
     //left motor
     digitalWrite(mLDirPin, HIGH);
-    analogWrite(mLSpeedPin, int(51*CL));
+    analogWrite(mLSpeedPin, int(51*CL)); //~
     //right motor
     digitalWrite(mRDirPin, LOW);
-    analogWrite(mRSpeedPin, int(51*CL));
+    analogWrite(mRSpeedPin, int(51*CL)); //~
   }
 
-  //Angle check (use an anlge check function to confirm correct angle then reset current angle to 0)
+  //Angle check (use an angle check function that I haven't finished to confirm correct angle)
   if ((eR == 0) && (eL == 0)) { //once both motors have reached the desired angle
     hasTurned = true;
   }
