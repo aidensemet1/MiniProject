@@ -14,7 +14,8 @@ String read_setpoint;
 float ref;  //radians for the wheel to turn
 float theta = 0;
 long count = 0;
-long newCount;
+long newCountR;
+long newCountL;
 
 //constants
 float radPerCount = 0.001963;
@@ -122,12 +123,20 @@ void loop() {
 }
 
 
-//function that gets the current position of the wheel
-float getCurrentPos() {
-  newCount = Rwheel.read();
-  theta = newCount * radPerCount;
-  return theta;
+//function that gets the current position of the Right wheel
+float getRCurrentPos() {
+  newCountR = Rwheel.read();
+  thetaR = newCountR * radPerCountR;
+  return thetaR;
 }
+
+//function that gets the current position of the left wheel
+float getLCurrentPos() {
+ newCountL = Lwheel.read();
+ thetaL = newCountL * radPerCountL;
+ return thetaL;
+}
+
 
 
 // This function initilizes the motor, direction, and enable pins
