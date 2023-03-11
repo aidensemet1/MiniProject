@@ -7,14 +7,16 @@ float desiredDistance = 2; //in feet
 float desiredAngle = 0; //in degrees
 
 //encoder pins for localization (2 and 3 are interrupt pins)
-Encoder Lwheel(2, 4);
+Encoder Lwheel(2, 11);
 Encoder Rwheel(3, 5);
 
 String read_setpoint;
 float ref;  //radians for the wheel to turn
 float theta = 0;
+float thetaL = 0;
 long count = 0;
 long newCount;
+long newCountL;
 
 //constants
 float radPerCount = 0.001963;
@@ -115,6 +117,7 @@ void loop() {
   eL = requiredRadiansFwd - getCurrentPosL();
   IeL = IeL + eL * Ts*0.001; // calculating the integral
   CL = Kp* eL + IeL* Ki; // This will be in volts
+  }
 
   //left motor
   if (CL >= 0) { //forward
@@ -140,8 +143,6 @@ void loop() {
     analogWrite(mRSpeedPin, int(-51*CR));
   }
 
-  
-
   while(millis() < Tc + Ts){}
 }
 
@@ -155,7 +156,7 @@ float getCurrentPosR() {
 //function that gets the current position of the left wheel
 float getCurrentPosL() {
  newCountL = Lwheel.read();
- thetaL = newCountL * radPerCountL;
+ thetaL = newCountL * radPerCount;
  return thetaL;
 }
 
