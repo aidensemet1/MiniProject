@@ -58,7 +58,7 @@ int CR; //right motor voltage
   requiredRadiansFwd = ((desiredDistance*12)/(circumference/2))*pi; //radians required to travel desired distance
   
   //turn in place calculations
-  requiredRadiansTrn = ((rotationDistance)/(circumference/2))*pi; //radians required to turn in place to desired angle
+  requiredRadiansTrn = ((rotationDistance)/(circumference/2))*pi; //radians required to turn in place to desired angle  
   
   //if no need to turn
   if (desiredAngle == 0) {
@@ -72,6 +72,8 @@ void loop() {
 
   //TURNING MOVEMENT
   if (true == true) {
+
+    //TESTING
     Serial.print(getCurrentAngle());
     Serial.print(" ");
     Serial.print(requiredRadiansTrn);
@@ -79,15 +81,20 @@ void loop() {
     Serial.print(getCurrentPosL());
     Serial.print(" ");
     Serial.print(getCurrentPosR());
+    Serial.print(" eL: ");
+    Serial.print(eL);
+    Serial.print(" eR: ");
+    Serial.print(eR);
+
     Serial.println();
 
     //left motor calculations
-    eL = requiredRadiansTrn - getCurrentPosL();
-
+    eL = abs(requiredRadiansTrn) - getCurrentPosL();
     IeL = IeL + eL * Ts*0.001; // calculating the integral
     CL = Kp* eL + IeL* Ki; // This will be in volts
+
     //right motor calculations
-    eR = requiredRadiansTrn - getCurrentPosR();
+    eR = abs(requiredRadiansTrn) - getCurrentPosR();
     IeR = IeR + eR * Ts*0.001; // calculating the integral
     CR = Kp* eR + IeR* Ki; // This will be in volts
   
@@ -101,8 +108,8 @@ void loop() {
 
       while (eR > 0.05) {
         //right motor
-        digitalWrite(mRDirPin, LOW);
-        analogWrite(mRSpeedPin, int(-51*CR));
+        digitalWrite(mRDirPin, HIGH);
+        analogWrite(mRSpeedPin, int(51*CR)); //~ had negatives
         break;
       }
     }
@@ -110,8 +117,8 @@ void loop() {
     if (desiredAngle < 0) { //counterclockwise
       while (eL > 0.05) {
         //left motor
-        digitalWrite(mLDirPin, LOW);
-        analogWrite(mLSpeedPin, int(-51*CL));
+        digitalWrite(mLDirPin, HIGH);
+        analogWrite(mLSpeedPin, int(51*CL)); // ~
         break;
       }
       
