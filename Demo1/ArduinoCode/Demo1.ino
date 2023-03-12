@@ -92,7 +92,7 @@ void loop() {
     CR = Kp* eR + IeR* Ki; // This will be in volts
   
     if (desiredAngle > 0) { //clockwise
-      while (getCurrentAngle() ) {
+      while (eL > 0.05) {
         //left motor
         digitalWrite(mLDirPin, HIGH);
         analogWrite(mLSpeedPin, int(51*CL));
@@ -118,7 +118,7 @@ void loop() {
       while (eR > 0.05) {
         //right motor
         digitalWrite(mRDirPin, HIGH);
-       analogWrite(mRSpeedPin, int(51*CR));
+        analogWrite(mRSpeedPin, int(51*CR));
        break;
       }
       
@@ -217,7 +217,7 @@ float getCurrentAngle() {
 
   float vehicleAngle = (abs(leftAngle) + abs(rightAngle))/2;
 
-  if (rightAngle < 0) { //if the vehicle travels counterclockwise then the angle is negative
+  if (rightAngle > 0) { //if the vehicle travels counterclockwise then the angle is negative
     vehicleAngle = vehicleAngle*-1;
   }
 
