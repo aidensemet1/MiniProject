@@ -1,7 +1,7 @@
 #include <Encoder.h>
 
-Encoder Lwheel(2,11);
-Encoder Rwheel(3,5);
+Encoder Lwheel(3,5);
+Encoder Rwheel(2,11);
 
 
 /*----------------------------------------------------------
