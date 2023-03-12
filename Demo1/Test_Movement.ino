@@ -9,15 +9,10 @@ int mLSpeedPin = 9;
 int mRDirPin = 8;
 int mRSpeedPin = 10;
 
-float desired_Distance = 2;
+int desired_Distance = 10;
 int counts_Per_Rev = 3200;
 float diameter = 6;
 float circum = PI * diameter;
-float distance_Per_Rev = circum;
-
-float revolutions = ((desired_Distance * 12) / distance_Per_Rev);
-//int steps = revolutions * counts_Per_Rev;
-int steps = 1;
       
 void setup() {
   Serial.begin (9600);
@@ -25,27 +20,27 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // put your main code here, to run repeatedly
+  if (desired_Distance == 10) {
     startcar();
-    delay(8265);   
-   
+    delay(7950);   
     stopcar();
     exit(0);
-
+  } else {
+    exit(0);
+  }
 }
+
 void startcar() {
   digitalWrite(mRDirPin, HIGH);
   digitalWrite(mLDirPin, HIGH);
-  //digitalWrite(mRSpeedPin, HIGH);
-  //digitalWrite(mLSpeedPin, HIGH);
   analogWrite(mRSpeedPin, 122);
-  analogWrite(mLSpeedPin, 105);
+  analogWrite(mLSpeedPin, 104.5);
 }
+
 void stopcar(){
   digitalWrite(mRDirPin, LOW);
   digitalWrite(mLDirPin, LOW);
-  //digitalWrite(mRSpeedPin, LOW);
-  //digitalWrite(mLSpeedPin, LOW);
   analogWrite(mRSpeedPin, 0);
   analogWrite(mLSpeedPin, 0);
 }
