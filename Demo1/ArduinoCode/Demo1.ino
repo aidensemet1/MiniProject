@@ -3,20 +3,12 @@ int N = 1; // loop iterations
 #include <Encoder.h>   // encoder Arduino library
 
 //distance and angle
-float desiredDistance = 10; //in feet
-float desiredAngle = 0; //in degrees
+float desiredDistance = 0; //in feet
+float desiredAngle = 90; //in degrees
 
 //encoder pins for localization (2 and 3 are interrupt pins)
-Encoder Lwheel(2, 11);
-Encoder Rwheel(3, 5);
-
-String read_setpoint;
-float ref;  //radians for the wheel to turn
-float thetaR = 0;
-float thetaL = 0;
-long count = 0;
-long newCountR;
-long newCountL;
+Encoder Lwheel(3, 5);
+Encoder Rwheel(2, 11);
 
 //constants
 float radPerCount = 0.001963;
@@ -30,7 +22,8 @@ float requiredRadiansFwd; //radians required for vehicle to move forward
 float requiredRadiansTrn; //radians required for vehicle to turn in place
 float desiredAngleRad = (pi/180)*desiredAngle; //desired angle converted to radians
 float rotationDistance = vehicleRadius*desiredAngleRad; //distance for each wheel to travel to achieve desired angle
-bool hasTurned = false;
+bool hasTurned = false; //has the vehicle completed turning
+
 
 //SETUP PINS (don't change these, they are specified on the motor driver data sheet)
 int D2 = 4; //motor board enable pin
@@ -67,6 +60,7 @@ int CR; //right motor voltage
   //turn in place calculations
   requiredRadiansTrn = ((rotationDistance)/(circumference/2))*pi; //radians required to turn in place to desired angle
   
+  //if no need to turn
   if (desiredAngle == 0) {
     hasTurned = true;
   }
@@ -74,121 +68,160 @@ int CR; //right motor voltage
 
 void loop() {
   // put your main code here, to run repeatedly:
-  //turning
 
-  /*
+
   //TURNING MOVEMENT
-  Tc = millis(); //get current time ms
-  //left motor calculations
-  eL = requiredRadiansTrn - getCurrentPosL();
-  IeL = IeL + eL * Ts*0.001; // calculating the integral
-  CL = Kp* eL + IeL* Ki; // This will be in volts
-  //right motor calculations
-  eR = requiredRadiansTrn - getCurrentPosR();
-  IeR = IeR + eR * Ts*0.001; // calculating the integral
-  CR = Kp* eR + IeR* Ki; // This will be in volts
- 
-  if (desiredAngle >= 0) { //clockwise
-    //left motor
-    digitalWrite(mLDirPin, HIGH);
-    analogWrite(mLSpeedPin, int(51*CL)); //~im not sure if any of these should have a - sign in them like the forward movement code
-    //right motor
-    digitalWrite(mRDirPin, LOW);
-    analogWrite(mRSpeedPin, int(-51*CR)); //~
-  } else { //counterclockwise
-    //left motor
-    digitalWrite(mLDirPin, LOW);
-    analogWrite(mLSpeedPin, int(-51*CL)); //~
-    //right motor
-    digitalWrite(mRDirPin, HIGH);
-    analogWrite(mRSpeedPin, int(51*CR)); //~
-  }
-  
-  //Angle check (use an angle check function that I haven't finished to confirm correct angle)
-  if ((eR == 0) && (eL == 0)) { //once both motors have reached the desired angle
-    hasTurned = true;
-  }
-  */
-  //FORWARD MOVEMENT
+  if (true == true) {
+    Serial.print(getCurrentAngle());
+    Serial.print(" ");
+    Serial.print(requiredRadiansTrn);
+    Serial.print(" ");
+    Serial.print(getCurrentPosL());
+    Serial.print(" ");
+    Serial.print(getCurrentPosR());
+    Serial.println();
 
-  //TESTING
-  Serial.print(requiredRadiansFwd);
+    //left motor calculations
+    eL = requiredRadiansTrn - getCurrentPosL();
 
-  //left calculations
-  Tc = millis(); //get current time ms
-  eL = requiredRadiansFwd - getCurrentPosL();
-  
-  while (eL > 0.05) {
     IeL = IeL + eL * Ts*0.001; // calculating the integral
     CL = Kp* eL + IeL* Ki; // This will be in volts
-    //left motor
-    if (CL >= 0) { //forward
-      digitalWrite(mLDirPin, HIGH);
-      analogWrite(mLSpeedPin, int(51*CL));
-    } else { //backward
-      digitalWrite(mLDirPin, LOW);
-      analogWrite(mLSpeedPin, int(-51*CL));
-    }
-    break;
-  }
-
-  //TESTING
-  Serial.print(" ");
-  Serial.print(getCurrentPosL());
-  Serial.print(" ");
-  Serial.print(CL);
-
-  //right calculations
-  eR = requiredRadiansFwd - getCurrentPosR();
-
-  while (eR > 0.05) {
+    //right motor calculations
+    eR = requiredRadiansTrn - getCurrentPosR();
     IeR = IeR + eR * Ts*0.001; // calculating the integral
     CR = Kp* eR + IeR* Ki; // This will be in volts
+  
+    if (desiredAngle > 0) { //clockwise
+      while (getCurrentAngle() ) {
+        //left motor
+        digitalWrite(mLDirPin, HIGH);
+        analogWrite(mLSpeedPin, int(51*CL));
+        break;
+      }
 
-    //right motor
-    if (CR >= 0) { //forward
-      digitalWrite(mRDirPin, HIGH);
-      analogWrite(mRSpeedPin, int(51*CR));
-    } else { //backward
-      digitalWrite(mRDirPin, LOW);
-      analogWrite(mRSpeedPin, int(-51*CR));
-    } 
-    break;
+      while (eR > 0.05) {
+        //right motor
+        digitalWrite(mRDirPin, LOW);
+        analogWrite(mRSpeedPin, int(-51*CR));
+        break;
+      }
+    }
+
+    if (desiredAngle < 0) { //counterclockwise
+      while (eL > 0.05) {
+        //left motor
+        digitalWrite(mLDirPin, LOW);
+        analogWrite(mLSpeedPin, int(-51*CL));
+        break;
+      }
+      
+      while (eR > 0.05) {
+        //right motor
+        digitalWrite(mRDirPin, HIGH);
+       analogWrite(mRSpeedPin, int(51*CR));
+       break;
+      }
+      
+    }
   }
 
-  //TESTING
-  Serial.print(" ");
-  Serial.print(getCurrentPosR());
-  Serial.print(" ");
-  Serial.print(CR);
 
-  Serial.println();
+  //ANGLE CHECK (use an angle check function that I haven't finished to confirm correct angle)
+  if ((getCurrentAngle() - desiredAngle) == 0) { //once both motors have reached the desired angle
+    hasTurned = true;
+  }
+  
+  //FORWARD MOVEMENT
+  if (hasTurned = true) {
+    //TESTING
+    //Serial.print(requiredRadiansFwd);
+
+    //left calculations
+    Tc = millis(); //get current time ms
+    eL = requiredRadiansFwd - getCurrentPosL();
+    
+    while (eL > 0.05) {
+      IeL = IeL + eL * Ts*0.001; // calculating the integral
+      CL = Kp* eL + IeL* Ki; // This will be in volts
+      //left motor
+      if (CL >= 0) { //forward
+        digitalWrite(mLDirPin, HIGH);
+        analogWrite(mLSpeedPin, int(51*CL));
+      } else { //backward
+        digitalWrite(mLDirPin, LOW);
+        analogWrite(mLSpeedPin, int(-51*CL));
+      }
+      break;
+    }
+
+    //TESTING
+    /*
+    Serial.print(" ");
+    Serial.print(getCurrentPosL());
+    Serial.print(" ");
+    Serial.print(CL);
+    */
+
+    //right calculations
+    eR = requiredRadiansFwd - getCurrentPosR();
+
+    while (eR > 0.05) {
+      IeR = IeR + eR * Ts*0.001; // calculating the integral
+      CR = Kp* eR + IeR* Ki; // This will be in volts
+
+      //right motor
+      if (CR >= 0) { //forward
+        digitalWrite(mRDirPin, HIGH);
+        analogWrite(mRSpeedPin, int(51*CR));
+      } else { //backward
+        digitalWrite(mRDirPin, LOW);
+        analogWrite(mRSpeedPin, int(-51*CR));
+      } 
+      break;
+    }
+
+    /*
+    //TESTING
+    Serial.print(" ");
+    Serial.print(getCurrentPosR());
+    Serial.print(" ");
+    Serial.print(CR);
+
+    Serial.println();
+    */    
+  }
 
   Tc = millis();
   while(millis() < Tc + Ts){}
-
-
 }
-
-
 
 //function that gets the current position of the wheel
 float getCurrentPosR() {
-  newCountR = Rwheel.read();
-  thetaR = newCountR * radPerCount;
+  long newCountR = Rwheel.read();
+  float thetaR = newCountR * radPerCount;
   return thetaR;
 }
 
 //function that gets the current position of the left wheel
 float getCurrentPosL() {
-  newCountL = Lwheel.read();
-  thetaL = newCountL * radPerCount;
+  long newCountL = Lwheel.read();
+  float thetaL = newCountL * radPerCount;
   return thetaL;
 }
 
-//function that will check the current angle of the vehicle
+//function that will check the current angle of the vehicle after turning in place
 float getCurrentAngle() {
-  
+  float leftAngle = (((getCurrentPosL()*circumference)/pi)/vehicleRadius)*(180/pi);
+  float rightAngle = (((getCurrentPosR()*circumference)/pi)/vehicleRadius)*(180/pi);
+
+
+  float vehicleAngle = (abs(leftAngle) + abs(rightAngle))/2;
+
+  if (rightAngle < 0) { //if the vehicle travels counterclockwise then the angle is negative
+    vehicleAngle = vehicleAngle*-1;
+  }
+
+  return vehicleAngle;
 }
 
 // This function initilizes the motor, direction, and enable pins
