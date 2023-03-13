@@ -71,7 +71,7 @@ void loop() {
 
 
   //TURNING MOVEMENT
-  if (true == true) {
+  if (hasTurned == false) {
 
     //TESTING
     Serial.print(getCurrentAngle());
@@ -102,14 +102,14 @@ void loop() {
       while (eL > 0.05) {
         //left motor
         digitalWrite(mLDirPin, HIGH);
-        analogWrite(mLSpeedPin, int(51*CL));
+        analogWrite(mLSpeedPin, abs(int(51*CL)));
         break;
       }
 
       while (eR > 0.05) {
         //right motor
         digitalWrite(mRDirPin, HIGH);
-        analogWrite(mRSpeedPin, int(51*CR)); //~ had negatives
+        analogWrite(mRSpeedPin, abs(int(51*CR))); //~ had negatives
         break;
       }
     }
@@ -118,14 +118,14 @@ void loop() {
       while (eL > 0.05) {
         //left motor
         digitalWrite(mLDirPin, HIGH);
-        analogWrite(mLSpeedPin, int(51*CL)); // ~
+        analogWrite(mLSpeedPin, abs(int(51*CL))); // ~
         break;
       }
       
       while (eR > 0.05) {
         //right motor
         digitalWrite(mRDirPin, HIGH);
-        analogWrite(mRSpeedPin, int(51*CR));
+        analogWrite(mRSpeedPin, abs(int(51*CR)));
        break;
       }
       
@@ -133,13 +133,13 @@ void loop() {
   }
 
 
-  //ANGLE CHECK (use an angle check function that I haven't finished to confirm correct angle)
+  //ANGLE CHECK
   if ((getCurrentAngle() - desiredAngle) == 0) { //once both motors have reached the desired angle
     hasTurned = true;
   }
   
   //FORWARD MOVEMENT
-  if (hasTurned = true) {
+  if (hasTurned == true) {
     //TESTING
     //Serial.print(requiredRadiansFwd);
 
