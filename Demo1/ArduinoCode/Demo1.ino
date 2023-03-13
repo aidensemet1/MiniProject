@@ -71,7 +71,7 @@ void loop() {
 
 
   //TURNING MOVEMENT
-  if (hasTurned == false) {
+  if (true == true) {
 
     //TESTING
     Serial.print(getCurrentAngle());
@@ -108,7 +108,7 @@ void loop() {
 
       while (eR > 0.05) {
         //right motor
-        digitalWrite(mRDirPin, HIGH);
+        digitalWrite(mRDirPin, LOW);
         analogWrite(mRSpeedPin, abs(int(51*CR))); //~ had negatives
         break;
       }
@@ -117,7 +117,7 @@ void loop() {
     if (desiredAngle < 0) { //counterclockwise
       while (eL > 0.05) {
         //left motor
-        digitalWrite(mLDirPin, HIGH);
+        digitalWrite(mLDirPin, LOW);
         analogWrite(mLSpeedPin, abs(int(51*CL))); // ~
         break;
       }
@@ -242,5 +242,4 @@ void motorSetup() {
   analogWrite(mRSpeedPin, 0); //set motor voltage to 0
   analogWrite(mLSpeedPin, 0); //set motor voltage to 0
 }
-
 
