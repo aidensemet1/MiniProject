@@ -102,7 +102,7 @@ void loop() {
       while (eL > 0.05) {
         //left motor
         digitalWrite(mLDirPin, HIGH);
-        analogWrite(mLSpeedPin, abs(int(51*CL)));
+        analogWrite(mLSpeedPin, abs(int(51*CL))); //255/CL
         break;
       }
 
