@@ -3,4 +3,4 @@ The purpose of Demo 1 is to demonstrate a movement and Aruco detection scheme fo
 
 Our Arduino movement controller code can be found within the "ArduinoCode" folder.
 
-Our Python camera vision code can be found within the "Python Code" folder.
+Our Python camera vision code can be found within the "PythonCode" folder.
