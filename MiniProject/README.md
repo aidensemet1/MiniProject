@@ -1,3 +1,4 @@
+# Mini Project
 The pupose of this mini project is to design a control system that regulates the rotational speed of a wheel attached to a motor based using an Arduino and Rasberry Pi, along with a mechanical encoder and camera. An Aruco marker is used to direct the rotation of the wheel. Each quadrant of the Pi camera corresponds to a different angular position of the wheel. Depending on which quadrant that the Aruco marker is detected on the Pi camera, the wheel will rotate to that position on the wheel. The desired setpoint and current position of the wheel is displayed on an LCD screen. Finally, the control system also rejects any disturbances, so that if someone tries to spin the wheel, the motor will resist and the marker will remain at the top.
 
 The Ardunio, Python, and MATLAB/Simulink code are all placed in their respective folders within the MiniProject folder. 
