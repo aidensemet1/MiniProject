@@ -3,24 +3,21 @@
 Encoder Lwheel(2,11); //encoder pins on the Arduino for the left motor wheel
 Encoder Rwheel(3,5);  //encoder pins on the Arduino for the right motor wheel
 
-
 /*----------------------------------------------------------
  * SETUP PINS (don't change these, they are specified on the 
  * motor driver data sheet)
  *----------------------------------------------------------
  */
-
-int D2 = 4; //motor board enable pin
-int mLDirPin = 7; //Left motor direction pin
-int mLSpeedPin = 9; //Left motor speed pin 
-int mRDirPin = 8; //right motor direction pin
-int mRSpeedPin = 10; //right motor speed pin
+int D2 = 4;   //motor board enable pin
+int mLDirPin = 7;   //Left motor direction pin
+int mLSpeedPin = 9;   //Left motor speed pin 
+int mRDirPin = 8;   //right motor direction pin
+int mRSpeedPin = 10;  //right motor speed pin
 
 /*----------------------------------------------------------
  * Constants
  *----------------------------------------------------------
  */
-
 float radPerCount = 0.001963;
 int period  = 5;
 float d = 12.0;
@@ -35,10 +32,9 @@ void setup() {
 }
 
 /*------------------------------------------------------------
- * Initialized motor angular position/velocity variables and
+ * Initialized motor angular position/velocity variables
  *------------------------------------------------------------
  */
-
 float leftTheta = 0;
 float rightTheta = 0;
 float CRho = 0;
@@ -48,16 +44,12 @@ float CPhi = 0;
  * Initialized motor control VELOCITY variables
  *------------------------------------------------------
  */
-
 float KiRhoDot = 2;
 float KiPhiDot = 2;
-
 float KdRhoDot = 20;
 float KdPhiDot = 2;
-
 float KpRhoDot = 7;
 float KpPhiDot = 7;
-
 float IRhoDot = 0;
 float IPhiDot = 0;
 
@@ -75,7 +67,7 @@ float ePhiDotPast = 0;
  * Initialized motor control POSITION variables
  *------------------------------------------------------
  */
-
+// PID controller variables
 float Ki = 0;
 float Kd = 0;
 float Kp = 5;
@@ -85,7 +77,8 @@ float eRhoPast = 0;
 float IRho = 0;
 float numRotations = 0;
 float desiredDist = 120; // in inches
-float desiredRotations = (desiredDist * 4) / (2 * 6.28 * radius);
+float desiredRotations = (desiredDist * 4) / (2 * 6.28 * radius);   //num of wheel rotations to make do go desired dist
+
 
 void loop() {
   while (numRotations <= desiredRotations) {
@@ -129,7 +122,7 @@ void loop() {
    
     while(millis() < startTime + period){}
     }
-    motorStop();
+    motorStop();    // stops the motor wheels from spinning
     delay(5000);
  }
 
@@ -202,22 +195,23 @@ double getLeftTheta() {
  *----------------------------------------------------------
  */
 void motorSetup() {
-  pinMode(mRDirPin, OUTPUT);
-  pinMode(mRSpeedPin, OUTPUT);
-  pinMode(mLDirPin, OUTPUT);
-  pinMode(mLSpeedPin, OUTPUT);
-  pinMode(D2, OUTPUT);
-  digitalWrite(D2,HIGH); //enable motor driver board
+  pinMode(mRDirPin, OUTPUT);    //right wheel direction control pin
+  pinMode(mRSpeedPin, OUTPUT);  //right wheel speed control pin
+  pinMode(mLDirPin, OUTPUT);    //left wheel direction control pin
+  pinMode(mLSpeedPin, OUTPUT);  //left wheel speed control pin
+  pinMode(D2, OUTPUT);          // motor drive board pin
+  
+  digitalWrite(D2,HIGH);    //enable motor driver board
   digitalWrite(mRDirPin, LOW);
   digitalWrite(mLDirPin, LOW);
-  analogWrite(mRSpeedPin, 0); //set motor voltage to 0
-  analogWrite(mLSpeedPin, 0); //set motor voltage to 0
+  analogWrite(mRSpeedPin, 0);   //set motor voltage to 0
+  analogWrite(mLSpeedPin, 0);   //set motor voltage to 0
 }
 /*------------------------------------------------------------
  * helper function that stops the motor wheels from spinning
  *------------------------------------------------------------
 */
 void motorStop() {
-  analogWrite(mRSpeedPin, 0);
-  analogWrite(mLSpeedPin, 0);
+  analogWrite(mRSpeedPin, 0);   //set motor voltage to 0
+  analogWrite(mLSpeedPin, 0);   //set motor voltage to 0
 }
