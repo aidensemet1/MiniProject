@@ -3,67 +3,57 @@
 Encoder Lwheel(2,11);
 Encoder Rwheel(3,5);
 
-
 /*----------------------------------------------------------
- *SETUP PINS (don't change these, they are specified on the 
- *motor driver data sheet)
+ * SETUP PINS (don't change these, they are specified on the 
+ * motor driver data sheet)
  *----------------------------------------------------------
 */
-int D2 = 4; //motor board enable pin
-int mLDirPin = 7; //Left motor direction pin
-int mLSpeedPin = 9; //Left motor speed pin 
-int mRDirPin = 8; //right motor direction pin
-int mRSpeedPin = 10; //right motor speed pin
+int D2 = 4;   //motor board enable pin
+int mLDirPin = 7;   //Left motor direction pin
+int mLSpeedPin = 9;   //Left motor speed pin 
+int mRDirPin = 8;   //right motor direction pin
+int mRSpeedPin = 10;  //right motor speed pin
 
 
 /*----------------------------------------------------------
  * Constants
- * ----------------------------------------------------------
+ *----------------------------------------------------------
  */
 
 float radPerCount = 0.001963;
 int period  = 5;
 float d = 12.0;
 float radius  = 6.0;
-//float phiDotDesired =0;
+//float phiDotDesired = 0;
 //float rhoDotDesired =15;
-
 
 
 void setup() {
   Serial.begin(250000);
   motorSetup();
-
 }
 
 /*----------------------------------------------------------
- * Initialized motor angular position/velocity variables and
- * ----------------------------------------------------------
+ * Initialized motor angular position/velocity variables
+ *----------------------------------------------------------
  */
-
-float leftTheta =0;
+float leftTheta = 0;
 float rightTheta = 0;
-float CRho =0;
+float CRho = 0;
 float CPhi = 0;
 
 /*----------------------------------------------------------
  * Initialized motor control VELOCITY variables
  * ----------------------------------------------------------
  */
-
 float KiRhoDot = 2;
-float KiPhiDot =2;
-
-float KdRhoDot =20;
-float KdPhiDot =2;
-
-float KpRhoDot =7;
+float KiPhiDot = 2;
+float KdRhoDot = 20;
+float KdPhiDot = 2;
+float KpRhoDot = 7;
 float KpPhiDot = 7;
-
-
-
-float IRhoDot =0;
-float IPhiDot =0;
+float IRhoDot = 0;
+float IPhiDot = 0;
 
 float phiDot;
 float rhoDot;
@@ -72,57 +62,51 @@ float ePhiDot;
 float DPhi;
 float CPhiDot;
 float CRhoDot;
-float eRhoDotPast =0;
-float ePhiDotPast =0;
-
+float eRhoDotPast = 0;
+float ePhiDotPast = 0;
 
 /*----------------------------------------------------------
  * Initialized motor control POSITION variables
  * ----------------------------------------------------------
  */
-
-
-float Ki =0;
-float Kd =0;
+float Ki = 0;
+float Kd = 0;
 float Kp = 5;
 
 float rhoDesired = 120.0;
-float eRhoPast =0;
-float IRho =0;
-float currentPhi =0;
+float eRhoPast = 0;
+float IRho = 0;
+float currentPhi = 0;
 
 float angleDesired = 90;
 float angleDesiredRad = (angleDesired * 6.28) / 180;
-float numRotations=0;
+float numRotations = 0;
 float desiredDist = 0; // I believe in inches
 float desiredRotations = 1.05 * ( (desiredDist *4) / (2 * 6.28 * radius) );
 
- void loop() {
-    while (abs(currentPhi) <= abs(angleDesiredRad)) {
+void loop() {
+  while (abs(currentPhi) <= abs(angleDesiredRad)) {
     unsigned long startTime = millis();
   
     //Position variables
     float newLeftTheta = getLeftTheta();
     float newRightTheta = getRightTheta();
 
-    
- 
     //Velocity variables
     float wLeft = 1000 * (newLeftTheta - leftTheta) / period;
     float wRight = 1000 * (newRightTheta - rightTheta) / period;
 
-    currentPhi =  .001 * period*((radius /d) * (wLeft - wRight)) + currentPhi;
-    Serial.println(currentPhi);
+    currentPhi = .001 * period * ((radius/d) * (wLeft - wRight)) + currentPhi;
+    //Serial.println(currentPhi);
   
     //get dot controller variables and write motor speed
-    if ( angleDesired >=0) {
+    if ( angleDesired >= 0) {
       dotController(newLeftTheta, newRightTheta, wLeft,wRight, 0, 1);
     } else {
       dotController(newLeftTheta, newRightTheta, wLeft,wRight, 0, -1);
     }
     writeToMotor(CRhoDot, CPhiDot);
   
-    
     //----------------------------------------------------------
     // set past values
     //----------------------------------------------------------
@@ -130,19 +114,14 @@ float desiredRotations = 1.05 * ( (desiredDist *4) / (2 * 6.28 * radius) );
     eRhoDotPast = eRhoDot;
     ePhiDotPast = ePhiDot;
   
-  
     leftTheta = newLeftTheta;
     rightTheta = newRightTheta;
     
-   
     while(millis() < startTime + period){}
     }
     motorStop();
     delay(5000);
  }
-
-
-
 
 
 //----------------------------------------------------------
@@ -156,8 +135,6 @@ void dotController(float newLeftTheta, float newRightTheta, float wLeft, float w
   eRhoDot =rhoDot - rhoDotDesired;
   ePhiDot = phiDot - phiDotDesired;
 
-
-  
   float DRhoDot = (eRhoDot - eRhoDotPast) / period;
   float DPhiDot = (ePhiDot - ePhiDotPast) / period;
 
@@ -167,7 +144,6 @@ void dotController(float newLeftTheta, float newRightTheta, float wLeft, float w
   CRhoDot = eRhoDot * KpRhoDot + KdRhoDot * DRhoDot + KiRhoDot * IRhoDot; // this will give the sum Vbar
   CPhiDot = ePhiDot * KpPhiDot + KdPhiDot * DPhiDot + KiPhiDot * IPhiDot; // this will give the diffence delta V
 }
-
 
 //----------------------------------------------------------
 // Calculate motor voltages and write to motor based off of
@@ -194,7 +170,6 @@ void writeToMotor(float CRho, float CPhi) {
   }
 }
 
-
 /*----------------------------------------------------------
  * helper funcition to get angular position of right wheel
  * ----------------------------------------------------------
@@ -213,11 +188,6 @@ double getLeftTheta() {
   return (leftCount * radPerCount);
 }
 
-void motorStop() {
-  analogWrite(mRSpeedPin, 0);
-  analogWrite(mLSpeedPin, 0);
-}
-
 /*----------------------------------------------------------
  * helper funciton to setup both motors
  * ----------------------------------------------------------
@@ -233,4 +203,12 @@ void motorSetup() {
   digitalWrite(mLDirPin, LOW);
   analogWrite(mRSpeedPin, 0); //set motor voltage to 0
   analogWrite(mLSpeedPin, 0); //set motor voltage to 0
+}
+/*---------------------------------------------
+ * helper function to stop both motors
+ *---------------------------------------------
+ */
+void motorStop() {
+  analogWrite(mRSpeedPin, 0);
+  analogWrite(mLSpeedPin, 0);
 }
