@@ -5,4 +5,4 @@ Our Arduino movement controller code can be found within the "ArduinoCode" folde
 
 Our Python camera vision code can be found within the "PythonCode" folder.
 
-Our Simulink models can be found within the "MATLAB - Simulink" folder.
+Our Simulink models can be found within the "Demo1_Simulations" folder.
