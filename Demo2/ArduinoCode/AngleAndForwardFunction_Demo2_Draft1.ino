@@ -92,14 +92,13 @@ void setup() {
 }
 
  void loop() {
-    //markerDetectionPhase();
-
+    markerDetectionPhase();
+    
     float camAngle = getCameraAngle();
     angleForward(camAngle,0);
 
     float camDist = getCameraDistance();
     angleForward(0,camDist);
-  
     delay(500000);
  }
 
@@ -143,17 +142,19 @@ float getCameraDistance() {
 void markerDetectionPhase() {
   bool locatedMarker = false;
   while (locatedMarker == false) {
-     angleForward(50, 0);
-     /*
+     angleForward(10, 0);
+     delay(50);
+     
      if (Serial.available() > 0) {
         String mes = Serial.readString();
         if (mes == "1") {
           digitalWrite(13, HIGH);
           locatedMarker == true;
           motorStop();
+          break;
         }
       }
-      */
+      
     }
 }
 
@@ -330,7 +331,6 @@ double getRightTheta() {
  */
 double getLeftTheta() {
   long leftCount = Lwheel.read();
-  Serial.println(leftCount);
   return (leftCount * radPerCount);
 }
 
@@ -338,6 +338,7 @@ void motorStop() {
   analogWrite(mRSpeedPin, 0);
   analogWrite(mLSpeedPin, 0);
 }
+
 
 /*----------------------------------------------------------
  * helper funciton to setup both motors
