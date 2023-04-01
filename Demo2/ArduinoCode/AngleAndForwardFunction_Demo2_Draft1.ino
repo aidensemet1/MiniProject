@@ -93,20 +93,13 @@ void setup() {
 
  void loop() {
     //markerDetectionPhase();
-    while (true) {
-      angleForward(0,10);
-      Serial.println("Done!");
-      Serial.println(numRotations);
-      motorStop();
-      delay(1000);
-      
-      
-    }
-    Serial.println("out of loop");
-    motorStop();
+
     float camAngle = getCameraAngle();
+    angleForward(camAngle,0);
+
     float camDist = getCameraDistance();
-    //angleForward(camAngle, camDist);
+    angleForward(0,camDist);
+  
     delay(500000);
  }
 
