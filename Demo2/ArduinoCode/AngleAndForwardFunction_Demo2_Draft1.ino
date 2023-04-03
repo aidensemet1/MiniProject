@@ -93,9 +93,9 @@ void setup() {
 
  void loop() {
     markerDetectionPhase();
-    
-    float camAngle = getCameraAngle();
-    angleForward(camAngle,0);
+    //delay(2000);
+    //float camAngle = getCameraAngle();
+    //angleForward(camAngle,0);
 
     float camDist = getCameraDistance();
     angleForward(0,camDist);
@@ -110,10 +110,10 @@ void setup() {
 float getCameraAngle() {
   //ard/pi code that gets angle
   float outputAngle =0;
-  if (Serial.available() >0) {
-    //float from pi may need to be followed by character (check documentation)
-    outputAngle = Serial.parseFloat(); 
-  }
+  //while (!(Serial.available() >0)) {}
+  //float from pi may need to be followed by character (check documentation)
+  //outputAngle = Serial.parseFloat(); 
+  
   //return outputAngle;
   return 90.0;
 }
@@ -126,12 +126,14 @@ float getCameraAngle() {
 float getCameraDistance() {
   //ard/pi code that gets distance to marker
   float outputDist =0;
-  if (Serial.available() >0) {
-    //float from pi may need to be followed by character (check documentation)
-    outputDist = Serial.parseFloat(); 
-  }
-  //return outputDist;
-  return 24.0;
+  while (!(Serial.available() >0)) {}
+  //float from pi may need to be followed by character (check documentation)
+  //Serial.read()
+  outputDist = Serial.parseFloat(); 
+  //outputDist = outputDist * 0.4;
+  Serial.println(outputDist);
+  return outputDist;
+  //return 24.0;
 }
 
 /*----------------------------------------------------------
