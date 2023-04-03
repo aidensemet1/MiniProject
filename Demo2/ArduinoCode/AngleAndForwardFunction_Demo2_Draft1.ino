@@ -1,4 +1,5 @@
 #include <Encoder.h>
+#include <Wire.h>
 
 Encoder Lwheel(2,11);
 Encoder Rwheel(3,5);
@@ -23,6 +24,8 @@ float radPerCount = 0.001963;
 int period  = 5;
 float d = 12.0;
 float radius  = 6.0;
+float outputDist = 0;
+byte buffer[4];
 
 /*----------------------------------------------------------
  * Initialized motor angular position/velocity variables and
@@ -84,6 +87,8 @@ float numRotations=0;
  * ----------------------------------------------------------
  */
 void setup() {
+  Wire.begin(0x04);
+  Wire.onRecieve(recieveEvent);
   Serial.begin(250000);
   motorSetup();
   pinMode(13,OUTPUT);
@@ -93,12 +98,13 @@ void setup() {
 
  void loop() {
     markerDetectionPhase();
+    Serial.println(outputDist);
     //delay(2000);
     //float camAngle = getCameraAngle();
-    //angleForward(camAngle,0);
-
-    float camDist = getCameraDistance();
-    angleForward(0,camDist);
+    //angleForward(camAngle,0); 
+    
+    //float camDist = getCameraDistance();
+    //angleForward(0,camDist);
     delay(500000);
  }
 
@@ -109,7 +115,7 @@ void setup() {
  */
 float getCameraAngle() {
   //ard/pi code that gets angle
-  float outputAngle =0;
+  float outputAngle = 0;
   //while (!(Serial.available() >0)) {}
   //float from pi may need to be followed by character (check documentation)
   //outputAngle = Serial.parseFloat(); 
@@ -123,9 +129,9 @@ float getCameraAngle() {
  * camera
  * ----------------------------------------------------------
  */
-float getCameraDistance() {
+/*float getCameraDistance() {
   //ard/pi code that gets distance to marker
-  float outputDist =0;
+  float outputDis = 0;
   while (!(Serial.available() >0)) {}
   //float from pi may need to be followed by character (check documentation)
   //Serial.read()
@@ -357,4 +363,11 @@ void motorSetup() {
   digitalWrite(mLDirPin, LOW);
   analogWrite(mRSpeedPin, 0); //set motor voltage to 0
   analogWrite(mLSpeedPin, 0); //set motor voltage to 0
+}
+
+void recieveEvent(int numBytes) {
+  for (int i=0, i<numBytes, i++) {
+    buffer[i] = Wire.read();
+  }
+  outputDist = *((float*)buffer);
 }
