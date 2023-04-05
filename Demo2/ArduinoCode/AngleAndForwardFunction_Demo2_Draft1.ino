@@ -15,6 +15,7 @@ int mLSpeedPin = 9; //Left motor speed pin
 int mRDirPin = 8; //right motor direction pin
 int mRSpeedPin = 10; //right motor speed pin
 
+bool newData = false;
 
 /*----------------------------------------------------------
  * Constants
@@ -88,83 +89,51 @@ float numRotations=0;
  */
 void setup() {
   Wire.begin(0x04);
-  Wire.onRecieve(recieveEvent);
+  Wire.onReceive(receiveEvent);
   Serial.begin(250000);
   motorSetup();
   pinMode(13,OUTPUT);
   digitalWrite(13, LOW);
 
 }
-
+ bool locatedMarker = false;
  void loop() {
-    markerDetectionPhase();
-    Serial.println(outputDist);
-    //delay(2000);
-    //float camAngle = getCameraAngle();
-    //angleForward(camAngle,0); 
+ 
+
+  while (locatedMarker == false) {
     
-    //float camDist = getCameraDistance();
-    //angleForward(0,camDist);
-    delay(500000);
+    angleForward(10,0);
+    if (newData) {
+      if (buffer[0] == 0 && buffer[1] == 1) {
+        locatedMarker = true;
+      }
+      newData = false;
+    }
+  }
+  
+  if (newData) {
+    int regNum = buffer[0];
+    if (regNum ==1) {
+      Serial.println("Angle");
+      
+      angleForward(buffer[1] - 54, 0);
+      newData = false;
+    } else {
+      Serial.println("Distance");
+      angleForward(0, buffer[1] * 0.4);
+      newData = false;
+    }
+    
+    
+  }
+  
+  
+ delay(5000000);
  }
 
 
-/*----------------------------------------------------------
- * Helper function for getting angle from rasp pi/camera
- * ----------------------------------------------------------
- */
-float getCameraAngle() {
-  //ard/pi code that gets angle
-  float outputAngle = 0;
-  //while (!(Serial.available() >0)) {}
-  //float from pi may need to be followed by character (check documentation)
-  //outputAngle = Serial.parseFloat(); 
-  
-  //return outputAngle;
-  return 90.0;
-}
 
-/*----------------------------------------------------------
- * Helper function for getting marker distance from rasp pi/
- * camera
- * ----------------------------------------------------------
- */
-/*float getCameraDistance() {
-  //ard/pi code that gets distance to marker
-  float outputDis = 0;
-  while (!(Serial.available() >0)) {}
-  //float from pi may need to be followed by character (check documentation)
-  //Serial.read()
-  outputDist = Serial.parseFloat(); 
-  //outputDist = outputDist * 0.4;
-  Serial.println(outputDist);
-  return outputDist;
-  //return 24.0;
-}
 
-/*----------------------------------------------------------
- * Initial detection phase that involves spinning robot
- * at constant rate until the marker is detected
- * ----------------------------------------------------------
- */
-void markerDetectionPhase() {
-  bool locatedMarker = false;
-  while (locatedMarker == false) {
-     angleForward(10, 0);
-     delay(50);
-     
-     if (Serial.available() > 0) {
-        String mes = Serial.readString();
-        if (mes == "1") {
-          digitalWrite(13, HIGH);
-          locatedMarker == true;
-          motorStop();
-          break;
-        }
-      }
-      
-    }
-}
 
 //----------------------------------------------------------
 // Activates robot to rotate specfic angle (degrees) and
@@ -365,9 +334,16 @@ void motorSetup() {
   analogWrite(mLSpeedPin, 0); //set motor voltage to 0
 }
 
-void recieveEvent(int numBytes) {
-  for (int i=0, i<numBytes, i++) {
-    buffer[i] = Wire.read();
-  }
-  outputDist = *((float*)buffer);
+void receiveEvent(int numBytes) {
+  //static volatile bool newData = false;
+  newData = true;
+  
+  uint8_t i =0;
+    while(Wire.available()){
+      byte in = Wire.read();
+      Serial.print(in);
+      buffer[i] = in;
+      i++;
+      Serial.println(" ");
+    }
 }
