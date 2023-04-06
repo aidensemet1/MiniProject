@@ -96,40 +96,30 @@ void setup() {
   digitalWrite(13, LOW);
 
 }
- bool locatedMarker = false;
- void loop() {
- 
+char state = 'f';
 
-  while (locatedMarker == false) {
-    
-    angleForward(10,0);
-    if (newData) {
-      if (buffer[0] == 0 && buffer[1] == 1) {
-        locatedMarker = true;
-      }
-      newData = false;
-    }
-  }
-  
-  if (newData) {
-    int regNum = buffer[0];
-    if (regNum ==1) {
-      Serial.println("Angle");
+void loop() {
+  //Serial.println(state);
+  switch (state) {
+    case 'n':
       
+      state = 'n';
+      break;
+    case 'f':
+      angleForward(10,0);
+      delay(50);
+      break;
+    case 'a':
       angleForward(buffer[1] - 54, 0);
-      newData = false;
-    } else {
-      Serial.println("Distance");
+      state = 'n';
+      break;
+
+    case 'd':
       angleForward(0, buffer[1] * 0.4);
-      newData = false;
-    }
-    
-    
+      state = 'n';
+      break;
   }
-  
-  
- delay(5000000);
- }
+}
 
 
 
@@ -346,4 +336,13 @@ void receiveEvent(int numBytes) {
       i++;
       Serial.println(" ");
     }
+  if (buffer[0] ==0) {
+    state = 'n';
+  } else if (buffer[0] ==1) {
+    state = 'a';
+  } else if (buffer[0] == 2) {
+    state = 'd';
+  } else {
+    state = 'n';
+  }
 }
