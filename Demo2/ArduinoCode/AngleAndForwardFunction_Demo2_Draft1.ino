@@ -96,10 +96,17 @@ void setup() {
   digitalWrite(13, LOW);
 
 }
+
+//state vairable state
+//'n' is do nothing
+//'f' is the finder state where the robot is rotating until it finds a marker
+//'a' is the angle state where the robot is rotating so it is facing the marker
+//'d' is the distant state where the robot will travel to distance to the marker
 char state = 'f';
 
 void loop() {
   //Serial.println(state);
+  //state machine controlling the robot through marker finding phase, an angle rotation phase, and a distance traveling phase
   switch (state) {
     case 'n':
       
@@ -324,6 +331,11 @@ void motorSetup() {
   analogWrite(mLSpeedPin, 0); //set motor voltage to 0
 }
 
+
+/*----------------------------------------------------------
+ * I2C event handler
+ * ----------------------------------------------------------
+ */
 void receiveEvent(int numBytes) {
   //static volatile bool newData = false;
   newData = true;
