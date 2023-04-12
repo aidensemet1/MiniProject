@@ -32,9 +32,9 @@ byte buffer[4];
  * Initialized motor angular position/velocity variables and
  * ----------------------------------------------------------
  */
-float leftTheta =0;
+float leftTheta = 0;
 float rightTheta = 0;
-float CRho =0;
+float CRho = 0;
 float CPhi = 0;
 
 /*----------------------------------------------------------
@@ -42,16 +42,16 @@ float CPhi = 0;
  * ----------------------------------------------------------
  */
 float KiRhoDot = 2;
-float KiPhiDot =2;
+float KiPhiDot = 2;
 
-float KdRhoDot =20;
-float KdPhiDot =2;
+float KdRhoDot = 20;
+float KdPhiDot = 2;
 
-float KpRhoDot =7;
+float KpRhoDot = 7;
 float KpPhiDot = 7;
 
-float IRhoDot =0;
-float IPhiDot =0;
+float IRhoDot = 0;
+float IPhiDot = 0;
 
 float phiDot;
 float rhoDot;
@@ -64,24 +64,24 @@ float DPhi;
 float CPhiDot;
 float CRhoDot;
 
-float eRhoDotPast =0;
-float ePhiDotPast =0;
+float eRhoDotPast = 0;
+float ePhiDotPast = 0;
 
 
 /*----------------------------------------------------------
  * Initialized motor control POSITION variables
  * ----------------------------------------------------------
  */
-float Ki =0;
-float Kd =0;
+float Ki = 0;
+float Kd = 0;
 float Kp = 5;
 
 float rhoDesired = 120.0;
-float eRhoPast =0;
-float IRho =0;
+float eRhoPast = 0;
+float IRho = 0;
 
-float currentPhi =0;
-float numRotations=0;
+float currentPhi = 0;
+float numRotations = 0;
 
 /*----------------------------------------------------------
  * SETUP AND MAIN LOOP
@@ -94,7 +94,6 @@ void setup() {
   motorSetup();
   pinMode(13,OUTPUT);
   digitalWrite(13, LOW);
-
 }
 
 //state vairable state
@@ -219,16 +218,16 @@ void angleForward(float angleDesired, float desiredDist) {
     }
 
 
-    leftTheta =0;
-    rightTheta =0;
+    leftTheta = 0;
+    rightTheta = 0;
     currentPhi = 0;
-    numRotations =0;  
+    numRotations = 0;  
     
     eRhoDot =-10;
     ePhiDot =-10;
 
-    eRhoDotPast =0;
-    ePhiDotPast =0;
+    eRhoDotPast = 0;
+    ePhiDotPast = 0;
     
     Lwheel.write(0);
     Rwheel.write(0);
@@ -336,7 +335,7 @@ void receiveEvent(int numBytes) {
   //static volatile bool newData = false;
   newData = true;
   
-  uint8_t i =0;
+  uint8_t i = 0;
     while(Wire.available()){
       byte in = Wire.read();
       Serial.print(in);
@@ -344,9 +343,9 @@ void receiveEvent(int numBytes) {
       i++;
       Serial.println(" ");
     }
-  if (buffer[0] ==0) {
+  if (buffer[0] == 0) {
     state = 'n';
-  } else if (buffer[0] ==1) {
+  } else if (buffer[0] == 1) {
     state = 'a';
   } else if (buffer[0] == 2) {
     state = 'd';
@@ -354,4 +353,3 @@ void receiveEvent(int numBytes) {
     state = 'n';
   }
 }
-
