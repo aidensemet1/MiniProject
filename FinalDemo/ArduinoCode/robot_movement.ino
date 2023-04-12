@@ -128,10 +128,6 @@ void loop() {
   }
 }
 
-
-
-
-
 //----------------------------------------------------------
 // Activates robot to rotate specfic angle (degrees) and
 // travel a certain distance (inches)
