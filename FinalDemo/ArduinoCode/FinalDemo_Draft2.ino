@@ -114,7 +114,7 @@ void loop() {
       break;
     case 'f':
       angleForward(20,0);
-      delay(50);
+      delay(60);
       break;
     case 'a':
       busy = true;
@@ -214,7 +214,7 @@ void angleForward(float angleDesired, float desiredDist) {
       float wRight = 1000 * (newRightTheta - rightTheta) / period;
     
       //get dot controller variables and write motor speed
-      dotController(newLeftTheta, newRightTheta, wLeft,wRight, 25,0);
+      dotController(newLeftTheta, newRightTheta, wLeft,wRight, 35,0);
       writeToMotor(CRhoDot, CPhiDot);
     
       //----------------------------------------------------------
